@@ -2,7 +2,6 @@
   "name": "room-factory",
   "version": "0.1.0",
   "description": "",
-  "private": true,
   "author":"Pablo Novas <pjnovas@gmail.com>",
   "main": "index.js",
   "directories": { 
