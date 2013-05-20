@@ -1,0 +1,37 @@
+{
+  "name": "room-factory",
+  "version": "0.1.0",
+  "description": "",
+  "author":"Pablo Novas <pjnovas@gmail.com>",
+  "main": "index.js",
+  "directories": { 
+    "lib" : "./lib"
+  },
+  "engines": {
+    "node": ">=0.8.x"
+  },
+  "dependencies": {
+    "underscore": "1.4.x"
+  },
+  "devDependencies": {
+    "mocha": "1.8.2",
+    "expect.js": "0.2.0"
+  },
+  "scripts": {
+    "test": "mocha test/ -R spec"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/pjnovas/room-factory.git"
+  },
+  "bugs": {
+    "web": "git://github.com/pjnovas/room-factory/issues" 
+  },
+  "keywords": [
+    "room",
+    "factory",
+    "manager",
+    "room-factory"
+  ],
+  "license": "MIT"
+}
