@@ -1,11 +1,11 @@
 {
   "name": "room-factory",
   "version": "0.1.0",
-  "description": "",
-  "author":"Pablo Novas <pjnovas@gmail.com>",
+  "description": "room-factory ============",
+  "author": "Pablo Novas <pjnovas@gmail.com>",
   "main": "index.js",
-  "directories": { 
-    "lib" : "./lib"
+  "directories": {
+    "test": "test"
   },
   "engines": {
     "node": ">=0.8.x"
@@ -25,7 +25,7 @@
     "url": "git://github.com/pjnovas/room-factory.git"
   },
   "bugs": {
-    "web": "git://github.com/pjnovas/room-factory/issues" 
+    "url": "git://github.com/pjnovas/room-factory/issues"
   },
   "keywords": [
     "room",
@@ -33,5 +33,7 @@
     "manager",
     "room-factory"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "e9e39e8abc2a9ac33ad1aea2f9247ea5a213645c"
 }
