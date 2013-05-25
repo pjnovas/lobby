@@ -15,7 +15,9 @@
   },
   "devDependencies": {
     "mocha": "1.8.2",
-    "expect.js": "0.2.0"
+    "expect.js": "0.2.0",
+    "express": "3.2.4",
+    "request":"2.x.x"
   },
   "scripts": {
     "test": "mocha test/ -R spec"

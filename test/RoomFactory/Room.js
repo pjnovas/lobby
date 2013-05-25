@@ -1,9 +1,9 @@
 
 var expect = require('expect.js'),
   _ = require('underscore'),
-  RoomManager = require('../lib'),
-  RoomStatus = require('../lib/RoomStatus')
-  Room = require('../lib/Room');
+  RoomManager = require('../../lib'),
+  roomStatus = require('../../lib/roomStatus')
+  Room = require('../../lib/Room');
 
 describe('Room', function(){
   var roomManager = new RoomManager();
