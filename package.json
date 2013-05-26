@@ -14,10 +14,12 @@
     "underscore": "1.4.x"
   },
   "devDependencies": {
-    "mocha": "1.8.2",
-    "expect.js": "0.2.0",
-    "express": "3.2.4",
-    "request":"2.x.x"
+    "mocha": "1.8.x",
+    "expect.js": "0.2.x",
+    "express": "3.2.x",
+    "request":"2.x.x",
+    "socket.io": "0.9.x",
+    "socket.io-client": "0.9.x"
   },
   "scripts": {
     "test": "mocha test/ -R spec"

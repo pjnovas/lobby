@@ -2,6 +2,7 @@
 var expect = require('expect.js');
 
 var express = require('express')
+  , socketIO = require('socket.io')
   , http = require('http')
   , path = require('path')
   , config = require('./config')
@@ -9,18 +10,14 @@ var express = require('express')
 
 var server;
 
-describe('Router', function(){
+describe('Events', function(){
 
-  after(function(done){
-    server.close(done);
-  });
-
-  var app = createExpressApp();
+  var io = createExpressApp();
 
   var roomFactory = new RoomFactory();
-  roomFactory.router(app);
-  
-  require('./room');
+  roomFactory.events(io);
+
+  require('./room')(roomFactory);
 });
 
 function createExpressApp(){
@@ -32,10 +29,13 @@ function createExpressApp(){
   app.use(app.router);
 
   server = http.createServer(app);
+  var io = socketIO.listen(server);
+
+  io.set('log level', 1);
 
   server.listen(app.get('port'), function(){
     console.log('TEST Express server listening on port ' + app.get('port'));
   });
 
-  return app;
+  return io;
 }
