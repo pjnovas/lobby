@@ -1,4 +1,4 @@
 
-require('./RoomFactory');
+require('./Lobby');
 require('./router');
 require('./events');

@@ -9,7 +9,7 @@ var options ={
   'force new connection': true
 };
 
-module.exports = function(roomFactory){
+module.exports = function(lobby){
 
   describe('Namespace /rooms', function(){
 
@@ -24,7 +24,7 @@ module.exports = function(roomFactory){
         fireConnect = false,
         fireJoin = false;
 
-      var room = roomFactory.create({
+      var room = lobby.create({
         seats: 3
       });
 
@@ -86,7 +86,7 @@ module.exports = function(roomFactory){
         fireDisconnect = false,
         fireLeave = false;
 
-      var room = roomFactory.create({
+      var room = lobby.create({
         seats: 3
       });
 
@@ -152,7 +152,7 @@ module.exports = function(roomFactory){
         uid3 = 'uid3',
         fireFull = false;
 
-      var room = roomFactory.create({
+      var room = lobby.create({
         seats: 3
       });
 

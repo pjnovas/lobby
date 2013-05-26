@@ -6,7 +6,7 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , config = require('./config')
-  , RoomFactory = require('../../lib');
+  , Lobby = require('../../lib');
 
 var server;
 
@@ -14,10 +14,10 @@ describe('Events', function(){
 
   var io = createExpressApp();
 
-  var roomFactory = new RoomFactory();
-  roomFactory.events(io);
+  var lobby = new Lobby();
+  lobby.events(io);
 
-  require('./room')(roomFactory);
+  require('./room')(lobby);
 });
 
 function createExpressApp(){
