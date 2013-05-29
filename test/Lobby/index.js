@@ -145,9 +145,16 @@ describe('Lobby', function(){
     expect(roomFull).to.be.equal(false);
     expect(userJoined).to.be.equal(false);
     
-
     room.removeAllListeners('user:join');
     room.removeAllListeners('room:full');
+  });
+
+  it('should expose all errors', function(){
+    expect(Lobby.error.UserNotFound).to.be(require('../../lib/errors/UserNotFound'))
+    expect(Lobby.error.UserAlreadyInRoom).to.be(require('../../lib/errors/UserAlreadyInRoom'))
+    expect(Lobby.error.InvalidUserOrId).to.be(require('../../lib/errors/InvalidUserOrId'))
+    expect(Lobby.error.RoomFull).to.be(require('../../lib/errors/RoomFull'))
+    expect(Lobby.error.NotOwner).to.be(require('../../lib/errors/NotOwner'))
   });
 
   require('./Room');
