@@ -98,12 +98,53 @@ describe('Room', function(){
     expect(jsonRoom.users).to.be.an('array');
     expect(jsonRoom.users.length).to.be.equal(idx);
 
-    expect(jsonRoom.users[0]).to.be.equal(1);
-    expect(jsonRoom.users[1]).to.be.equal(2);
+    expect(jsonRoom.users[0].id).to.be.equal(1);
+    expect(jsonRoom.users[1].id).to.be.equal(2);
 
     room.clear();
   });
 
+  it('should fire an start event after the room is full and auto-start');/*, function(){
+    var idx = 0,
+      joinCalls = 0,
+      fullCalled = false,
+      startCalls = false;
+
+    expect(room.freeSeats()).to.be(seats);
+
+    room.on('user:join', function(){
+      joinCalls++;
+    });
+
+    room.on('room:full', function(){
+      expect(idx).to.be.equal(seats);
+      fullCalled = true;
+    });
+
+    room.on('room:start', function(){
+      expect(idx).to.be.equal(seats);
+      startCalls = true;
+    });
+
+    _.times(5, function(i){
+      idx++;
+      room.join(i+1);
+      expect(room.freeSeats()).to.be(seats - idx);
+    });
+
+    expect(fullCalled).to.be.ok();
+
+    expect(room.freeSeats()).to.be(0);
+    expect(joinCalls).to.be.equal(seats);
+    expect(startCalls).to.be.equal(true);
+    expect(room.isFull()).to.be.ok();
+    expect(room.isEmpty()).to.not.be.ok();
+
+    room.removeAllListeners('user:join');
+    room.removeAllListeners('room:full');
+    room.removeAllListeners('room:start');
+  });
+*/
   it('should allow to be destroyed', function(){
     var emitted = false;
 

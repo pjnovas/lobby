@@ -33,12 +33,12 @@ module.exports = function(lobby){
       var client_uid1 = io.connect(socketURL, options);
       
       client_uid1.on('room:user:join',function(data){
-        expect(data.uid).to.be.equal(uid2);
+        expect(data.id).to.be.equal(uid2);
         fireJoin = true;
       });
 
       client_uid1.on('room:user:connect',function(data){
-        expect(data.uid).to.be.equal(uid2);
+        expect(data.id).to.be.equal(uid2);
         fireConnect = true;
       });
 
@@ -95,12 +95,12 @@ module.exports = function(lobby){
       var client_uid1 = io.connect(socketURL, options);
       
       client_uid1.on('room:user:leave',function(data){
-        expect(data.uid).to.be.equal(uid2);
+        expect(data.id).to.be.equal(uid2);
         fireLeave = true;
       });
 
       client_uid1.on('room:user:disconnect',function(data){
-        expect(data.uid).to.be.equal(uid2);
+        expect(data.id).to.be.equal(uid2);
         fireDisconnect = true;
       });
 

@@ -51,7 +51,7 @@ describe('/rooms', function(){
         expect(room.seats.total).to.be.equal(4);
         expect(room.seats.taken).to.be.equal(1);
 
-        expect(room.users[0]).to.be.equal('uid1');
+        expect(room.users[0].id).to.be.equal('uid1');
 
         done();
       });
@@ -279,7 +279,7 @@ describe('/rooms', function(){
           expect(room.seats.total).to.be.equal(3);
           expect(room.seats.taken).to.be.equal(1);
 
-          expect(room.users[0]).to.be.equal(uid);
+          expect(room.users[0].id).to.be.equal(uid);
           lastRoomId = room.id;
 
           done();
@@ -301,8 +301,8 @@ describe('/rooms', function(){
           expect(room.seats.total).to.be.equal(3);
           expect(room.seats.taken).to.be.equal(2);
 
-          expect(room.users[0]).to.be.equal(uid);
-          expect(room.users[1]).to.be.equal(uid2);
+          expect(room.users[0].id).to.be.equal(uid);
+          expect(room.users[1].id).to.be.equal(uid2);
 
           done();
         });
