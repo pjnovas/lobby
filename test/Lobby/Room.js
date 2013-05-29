@@ -1,9 +1,15 @@
 
-var expect = require('expect.js'),
-  _ = require('underscore'),
-  RoomManager = require('../../lib'),
-  roomStatus = require('../../lib/roomStatus')
-  Room = require('../../lib/Room');
+var expect = require('expect.js')
+  , _ = require('underscore')
+  , RoomManager = require('../../lib')
+  , roomStatus = require('../../lib/roomStatus')
+  , Room = require('../../lib/Room');
+
+var UserNotFoundError = require('../../lib/errors/UserNotFound')
+  , UserAlreadyInRoomError = require('../../lib/errors/UserAlreadyInRoom')
+  , InvalidUserOrIdError = require('../../lib/errors/InvalidUserOrId')
+  , RoomFullError = require('../../lib/errors/RoomFull')
+  , NotOwnerError = require('../../lib/errors/NotOwner');
 
 describe('Room', function(){
   var roomManager = new RoomManager();
@@ -13,12 +19,53 @@ describe('Room', function(){
     seats: seats
   });
 
+  it('should validate user when joins or leaves a room', function(){
+
+    function validate(e) {
+      expect(e).to.be.a(InvalidUserOrIdError);
+    }
+
+    expect(function(){
+      room.join();
+    }).to.throwError(validate);
+
+    expect(function(){
+      room.join({});
+    }).to.throwError(validate);
+
+    expect(function(){
+      room.join({ id: {} });
+    }).to.throwError(validate);
+
+    expect(function(){
+      room.join({ id: [] });
+    }).to.throwError(validate);
+
+    expect(function(){
+      room.leave();
+    }).to.throwError(validate);
+
+    expect(function(){
+      room.leave({});
+    }).to.throwError(validate);
+
+    expect(function(){
+      room.leave({ id: {} });
+    }).to.throwError(validate);
+
+    expect(function(){
+      room.join({ id: [] });
+    }).to.throwError(validate);
+
+  });
+
   it('should allow to join a user', function(){
     var idx = 0,
       joinCalls = 0,
       fullCalled = false;
 
     expect(room.freeSeats()).to.be(seats);
+    expect(room.autoStart).to.be(false);
 
     room.on('user:join', function(){
       joinCalls++;
@@ -32,6 +79,15 @@ describe('Room', function(){
     _.times(5, function(i){
       idx++;
       room.join(i+1);
+
+      if (idx < seats){
+        expect(function(){
+          room.join(i+1);
+        }).to.throwError(function (e) {
+          expect(e).to.be.a(UserAlreadyInRoomError);
+        });
+      }
+
       expect(room.freeSeats()).to.be(seats - idx);
     });
 
@@ -41,6 +97,12 @@ describe('Room', function(){
     expect(joinCalls).to.be.equal(seats);
     expect(room.isFull()).to.be.ok();
     expect(room.isEmpty()).to.not.be.ok();
+
+    expect(function(){
+      room.join('uid15');
+    }).to.throwError(function (e) {
+      expect(e).to.be.a(RoomFullError);
+    });
 
     room.removeAllListeners('user:join');
     room.removeAllListeners('room:full');
@@ -63,6 +125,15 @@ describe('Room', function(){
     _.times(5, function(i){
       idx--;
       room.leave(i+1);
+
+      if (idx > 0){
+        expect(function(){
+          room.leave(i+1);
+        }).to.throwError(function (e) {
+          expect(e).to.be.a(UserNotFoundError);
+        });
+      }
+
       expect(room.freeSeats()).to.be(seats - idx); 
     });
 
@@ -104,11 +175,34 @@ describe('Room', function(){
     room.clear();
   });
 
-  it('should fire an start event after the room is full and auto-start');/*, function(){
+  it('should allow to be destroyed', function(){
+    var emitted = false;
+
+    roomManager.on('room:destroy', function(){
+      emitted = true;
+    });
+
+    var rid = room.id;
+    room.destroy();
+
+    expect(emitted).to.be.equal(true);
+
+    var found = roomManager.getById(rid);
+    expect(found).to.not.be.ok();
+
+    roomManager.removeAllListeners('room:destroy');
+  });
+
+  it('should fire an start event after the room is full and auto-start is true', function(){
     var idx = 0,
       joinCalls = 0,
       fullCalled = false,
       startCalls = false;
+
+    var room = roomManager.create({
+      seats: seats,
+      autoStart: true
+    });
 
     expect(room.freeSeats()).to.be(seats);
 
@@ -144,23 +238,87 @@ describe('Room', function(){
     room.removeAllListeners('room:full');
     room.removeAllListeners('room:start');
   });
-*/
-  it('should allow to be destroyed', function(){
-    var emitted = false;
 
-    roomManager.on('room:destroy', function(){
-      emitted = true;
+  it('should NOT fire an start event after the room is full by default', function(){
+    var idx = 0,
+      startCalls = false;
+
+    var room = roomManager.create({
+      seats: seats
     });
 
-    var rid = room.id;
-    room.destroy();
+    room.on('room:start', function(){
+      expect(idx).to.be.equal(seats);
+      startCalls = true;
+    });
 
-    expect(emitted).to.be.equal(true);
+    _.times(5, function(i){
+      idx++;
+      room.join(i+1);
+    });
 
-    var found = roomManager.getById(rid);
-    expect(found).to.not.be.ok();
+    expect(startCalls).to.be.equal(false);
+    room.removeAllListeners('room:start');
+  });
 
-    roomManager.removeAllListeners('room:destroy');
+  it('should change the state to STARTED and fire start event when start() is called', function(){
+    var idx = 0,
+      startCalls = false;
+
+    var room = roomManager.create({
+      seats: seats
+    });
+
+    room.on('room:start', function(){
+      expect(idx).to.be.equal(seats);
+      startCalls = true;
+    });
+
+    _.times(5, function(i){
+      idx++;
+      room.join(i+1);
+    });
+
+    expect(startCalls).to.be.equal(false);
+
+    room.start();
+    expect(startCalls).to.be.equal(true);
+    expect(room.status).to.be.equal(roomStatus.STARTED);
+    room.removeAllListeners('room:start');
+  });
+
+  it('should only allow owner (if is specified) to run a room start when autostart is false', function(){
+    var idx = 0,
+      startCalls = false;
+
+    var room = roomManager.create({
+      seats: seats,
+      owner: 'uid1'
+    });
+
+    room.on('room:start', function(){
+      expect(idx).to.be.equal(seats);
+      startCalls = true;
+    });
+
+    _.times(5, function(i){
+      idx++;
+      room.join(i+1);
+    });
+
+    expect(function(){
+      room.start();
+    }).to.throwError(function (e) {
+      expect(e).to.be.a(NotOwnerError);
+    });
+
+    expect(startCalls).to.be.equal(false);
+    expect(room.status).to.be.equal(roomStatus.READY);
+
+    room.start('uid1');
+    expect(startCalls).to.be.equal(true);
+    expect(room.status).to.be.equal(roomStatus.STARTED);
+    room.removeAllListeners('room:start');
   });
 
 });

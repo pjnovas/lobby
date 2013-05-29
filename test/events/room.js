@@ -14,7 +14,7 @@ module.exports = function(lobby){
   describe('Namespace /rooms', function(){
 
     before(function(){
-      socketURL += "/rooms";      
+      socketURL += "/rooms";
     });
 
     it('should emit when a user joins a room and connects to it', function(done){
@@ -177,6 +177,49 @@ module.exports = function(lobby){
           setTimeout(function(){
 
             expect(fireFull).to.be.equal(true);
+            done(); 
+
+          }, 50);
+
+        });
+
+      });
+
+    });
+
+    it('should emit start when a room is full and autostart is true', function(done){
+      var 
+        uid1 = 'uid1',
+        uid2 = 'uid2',
+        uid3 = 'uid3',
+        fireStart = false;
+
+      var room = lobby.create({
+        seats: 3,
+        autoStart: true
+      });
+
+      room.join(uid1);
+
+      var client_uid1 = io.connect(socketURL, options);
+      
+      client_uid1.on('room:start',function(data){
+        fireStart = true;
+      });
+
+      client_uid1.on('connect',function(data){
+        
+        client_uid1.emit('room:user:connect', {
+          userId: uid1,
+          roomId: room.id
+        }, function(){
+
+          room.join(uid2);
+          room.join(uid3);
+
+          setTimeout(function(){
+
+            expect(fireStart).to.be.equal(true);
             done(); 
 
           }, 50);
