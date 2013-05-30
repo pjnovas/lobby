@@ -54,7 +54,7 @@ describe('Room', function(){
     }).to.throwError(validate);
 
     expect(function(){
-      room.join({ id: [] });
+      room.leave({ id: [] });
     }).to.throwError(validate);
 
   });

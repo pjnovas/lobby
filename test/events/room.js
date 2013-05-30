@@ -47,7 +47,8 @@ module.exports = function(lobby){
         client_uid1.emit('room:user:connect', {
           userId: uid1,
           roomId: room.id
-        }, function(){
+        }, function(err){
+          expect(err).to.not.be.ok();
 
           room.join(uid2);
 
@@ -58,7 +59,8 @@ module.exports = function(lobby){
             client_uid2.emit('room:user:connect', {
               userId: uid2,
               roomId: room.id
-            }, function(){
+            }, function(err){
+              expect(err).to.not.be.ok();
 
               setTimeout(function(){
                 expect(fireConnect).to.be.equal(true);
@@ -109,7 +111,8 @@ module.exports = function(lobby){
         client_uid1.emit('room:user:connect', {
           userId: uid1,
           roomId: room.id
-        }, function(){
+        }, function(err){
+          expect(err).to.not.be.ok();
 
           room.join(uid2);
 
@@ -120,7 +123,8 @@ module.exports = function(lobby){
             client_uid2.emit('room:user:connect', {
               userId: uid2,
               roomId: room.id
-            }, function(){
+            }, function(err){
+              expect(err).to.not.be.ok();
 
               setTimeout(function(){
 
@@ -164,12 +168,14 @@ module.exports = function(lobby){
         fireFull = true;
       });
 
-      client_uid1.on('connect',function(data){
-        
+      client_uid1.on('connect',function(err, data){
+        expect(err).to.not.be.ok();
+
         client_uid1.emit('room:user:connect', {
           userId: uid1,
           roomId: room.id
-        }, function(){
+        }, function(err){
+          expect(err).to.not.be.ok();
 
           room.join(uid2);
           room.join(uid3);
@@ -209,7 +215,8 @@ module.exports = function(lobby){
         client_uid1.emit('room:user:connect', {
           userId: uid1,
           roomId: room.id
-        }, function(){
+        }, function(err){
+          expect(err).to.not.be.ok();
 
           room.destroy();
 
@@ -220,6 +227,57 @@ module.exports = function(lobby){
 
           }, 50);
 
+        });
+
+      });
+
+    });
+
+    it('should throw an error if the room is not found on join', function(done){
+      var 
+        uid1 = 'uid1',
+        fakeRoomId = 12568;
+
+      var client_uid1 = io.connect(socketURL, options);
+
+      client_uid1.on('connect',function(data){
+        
+        client_uid1.emit('room:user:connect', {
+          userId: uid1,
+          roomId: fakeRoomId
+        }, function(err, users){
+
+          expect(err).to.be.ok();
+          expect(err.code).to.be.equal('RoomNotFound');
+
+          done();
+        });
+
+      });
+
+    });
+
+    it('should throw an error if the user is not joined on the room', function(done){
+      var 
+        uid1 = 'uid1';
+
+      var room = lobby.create({
+        seats: 3
+      });
+
+      var client_uid1 = io.connect(socketURL, options);
+
+      client_uid1.on('connect',function(data){
+        
+        client_uid1.emit('room:user:connect', {
+          userId: uid1,
+          roomId: room.id
+        }, function(err, users){
+
+          expect(err).to.be.ok();
+          expect(err.code).to.be.equal('UserNotFound');
+
+          done();
         });
 
       });
@@ -251,7 +309,8 @@ module.exports = function(lobby){
         client_uid1.emit('room:user:connect', {
           userId: uid1,
           roomId: room.id
-        }, function(){
+        }, function(err){
+          expect(err).to.not.be.ok();
 
           room.join(uid2);
           room.join(uid3);

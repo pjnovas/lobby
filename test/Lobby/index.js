@@ -1,13 +1,35 @@
 
-var expect = require('expect.js'),
-  _ = require('underscore'),
-  Lobby = require('../../lib'),
-  roomStatus = require('../../lib/roomStatus')
-  Room = require('../../lib/Room');
+var expect = require('expect.js')
+  , _ = require('underscore')
+  , Lobby = require('../../lib')
+  , roomStatus = require('../../lib/roomStatus')
+  , Room = require('../../lib/Room');
+
+var InvalidRoomOrIdError = require('../../lib/errors/InvalidRoomOrId')
 
 describe('Lobby', function(){
   var lobby = new Lobby(),
     lastRoom;
+
+  it('should validate room Id on getById', function(){
+
+    function validate(e) {
+      expect(e).to.be.a(InvalidRoomOrIdError);
+    }
+
+    expect(function(){
+      lobby.getById();
+    }).to.throwError(validate);
+
+    expect(function(){
+      lobby.getById({});
+    }).to.throwError(validate);
+
+    expect(function(){
+      lobby.getById([]);
+    }).to.throwError(validate);
+
+  });
 
   it('should allow to create a room', function(){
     var emitted = false;
@@ -62,6 +84,29 @@ describe('Lobby', function(){
 
     room.removeAllListeners('room:destroy');
     lobby.removeAllListeners('room:destroy');
+  });
+
+  it('should allow to find or create a room queue with no options', function(){
+    var emitted = false;
+  
+    lobby.on('room:create', function(){
+      emitted = true;
+    });
+
+    var lenBefore = lobby.rooms.length;
+
+    // 1. Run first Queue with user uid1 and no config
+    var room = lobby.queue('uid1');
+
+    // 2. Queue Room created with default config seats = 2
+    //    and user uid1 has been joined
+    expect(room.owner).to.be.equal('queue');
+    expect(room.status).to.be.equal(roomStatus.WAITING);
+    expect(room.users).to.have.property('uid1');
+    var lenFirstAfter = lobby.rooms.length;
+    expect(lenFirstAfter).to.be.equal(lenBefore + 1);
+
+    room.destroy();
   });
 
   it('should allow to find or create a room queue', function(){
@@ -154,8 +199,10 @@ describe('Lobby', function(){
 
   it('should expose all errors', function(){
     expect(Lobby.error.UserNotFound).to.be(require('../../lib/errors/UserNotFound'))
+    expect(Lobby.error.RoomNotFound).to.be(require('../../lib/errors/RoomNotFound'))
     expect(Lobby.error.UserAlreadyInRoom).to.be(require('../../lib/errors/UserAlreadyInRoom'))
     expect(Lobby.error.InvalidUserOrId).to.be(require('../../lib/errors/InvalidUserOrId'))
+    expect(Lobby.error.InvalidRoomOrId).to.be(require('../../lib/errors/InvalidRoomOrId'))
     expect(Lobby.error.RoomFull).to.be(require('../../lib/errors/RoomFull'))
     expect(Lobby.error.NotOwner).to.be(require('../../lib/errors/NotOwner'))
   });
