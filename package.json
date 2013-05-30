@@ -1,6 +1,6 @@
 {
   "name": "lobby",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Room factory of Users for NodeJS with ExpressJS routes and SocketIO events",
   "author": "Pablo Novas <pjnovas@gmail.com>",
   "main": "index.js",
