@@ -47,7 +47,7 @@ describe('Lobby', function(){
     expect(emitted).to.be.equal(true);
 
     expect(room).to.be.a(Room);
-    expect(room.id).to.be.greaterThan(0);
+    expect(room.id).to.be.ok();
     expect(room.myprop).to.be.a('object');
     expect(room.myprop.hello).to.be.equal('world');
 
