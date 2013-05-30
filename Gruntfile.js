@@ -8,6 +8,12 @@ module.exports = function (grunt) {
           reporter: 'spec'
         }
       },
+      html: {
+        options: {
+          reporter: 'html-cov',
+          output: 'coverage.html'
+        }
+      },
       coverage: {
         options: {
           reporter: 'mocha-term-cov-reporter',
@@ -31,7 +37,7 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks('grunt-mocha-cov');
 
-  grunt.registerTask('test', ['mochacov:unit', 'mochacov:coverage']);
+  grunt.registerTask('test', ['mochacov:unit', 'mochacov:coverage', 'mochacov:html']);
   grunt.registerTask('travis', ['mochacov:unit', 'mochacov:coverage', 'mochacov:coveralls']);
   grunt.registerTask('default', 'test');
 };
