@@ -31,6 +31,7 @@ describe('Lobby', function(){
 
     lastRoom = room;
     room.removeAllListeners('room:create');
+    lobby.removeAllListeners('room:create');
   });
 
   it('should allow to get a room by Id', function(){
@@ -60,6 +61,7 @@ describe('Lobby', function(){
     expect(found).to.not.be.ok();
 
     room.removeAllListeners('room:destroy');
+    lobby.removeAllListeners('room:destroy');
   });
 
   it('should allow to find or create a room queue', function(){
@@ -147,6 +149,7 @@ describe('Lobby', function(){
     
     room.removeAllListeners('user:join');
     room.removeAllListeners('room:full');
+    lobby.removeAllListeners('room:create');
   });
 
   it('should expose all errors', function(){
@@ -155,6 +158,19 @@ describe('Lobby', function(){
     expect(Lobby.error.InvalidUserOrId).to.be(require('../../lib/errors/InvalidUserOrId'))
     expect(Lobby.error.RoomFull).to.be(require('../../lib/errors/RoomFull'))
     expect(Lobby.error.NotOwner).to.be(require('../../lib/errors/NotOwner'))
+  });
+
+  it('should allow to be destroyed', function(){
+    var lobbyX = new Lobby();
+
+    var room1 = lobbyX.create();
+    var room2 = lobbyX.create();
+
+    expect(lobbyX.rooms.length).to.be.equal(2);
+
+    lobbyX.destroy();
+
+    expect(lobbyX.rooms).to.not.be.ok();
   });
 
   require('./Room');

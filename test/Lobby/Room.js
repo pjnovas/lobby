@@ -178,7 +178,7 @@ describe('Room', function(){
   it('should allow to be destroyed', function(){
     var emitted = false;
 
-    roomManager.on('room:destroy', function(){
+    room.on('room:destroy', function(){
       emitted = true;
     });
 
@@ -189,8 +189,56 @@ describe('Room', function(){
 
     var found = roomManager.getById(rid);
     expect(found).to.not.be.ok();
+  });
 
-    roomManager.removeAllListeners('room:destroy');
+  it('should self-destroy as default when the room is empty', function(){
+    var emitted = false;
+
+    var room = roomManager.create({
+      seats: 2
+    });
+
+    room.on('room:destroy', function(){
+      emitted = true;
+    });
+
+    room.join('uid1');
+    room.join('uid2');
+
+    room.leave('uid1');
+    room.leave('uid2');
+
+    expect(emitted).to.be.equal(true);
+
+    var rid = room.id;
+    var found = roomManager.getById(rid);
+    expect(found).to.not.be.ok();
+  });
+
+  it('should NOT self-destroy if autoDestroy is disabled', function(){
+    var emitted = false;
+
+    var room = roomManager.create({
+      seats: 2,
+      autoDestroy: false
+    });
+
+    room.on('room:destroy', function(){
+      emitted = true;
+    });
+
+    room.join('uid1');
+    room.join('uid2');
+
+    room.leave('uid1');
+    room.leave('uid2');
+
+    expect(emitted).to.be.equal(false);
+
+    var rid = room.id;
+    var found = roomManager.getById(rid);
+    expect(found).to.be.ok();
+    expect(found.id).to.be.equal(rid);
   });
 
   it('should fire an start event after the room is full and auto-start is true', function(){

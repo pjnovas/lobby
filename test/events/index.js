@@ -29,13 +29,9 @@ function createExpressApp(){
   app.use(app.router);
 
   server = http.createServer(app);
-  var io = socketIO.listen(server);
+  var io = socketIO.listen(server, { log: false });
 
-  io.set('log level', 1);
-
-  server.listen(app.get('port'), function(){
-    console.log('TEST Express server listening on port ' + app.get('port'));
-  });
+  server.listen(app.get('port'));
 
   return io;
 }

@@ -187,6 +187,45 @@ module.exports = function(lobby){
 
     });
 
+    it('should emit when a room is destroyed', function(done){
+      var 
+        uid1 = 'uid1',
+        fireDestroy = false;
+
+      var room = lobby.create({
+        seats: 3
+      });
+
+      room.join(uid1);
+
+      var client_uid1 = io.connect(socketURL, options);
+      
+      client_uid1.on('room:destroy',function(data){
+        fireDestroy = true;
+      });
+
+      client_uid1.on('connect',function(data){
+        
+        client_uid1.emit('room:user:connect', {
+          userId: uid1,
+          roomId: room.id
+        }, function(){
+
+          room.destroy();
+
+          setTimeout(function(){
+
+            expect(fireDestroy).to.be.equal(true);
+            done(); 
+
+          }, 50);
+
+        });
+
+      });
+
+    });
+
     it('should emit start when a room is full and autostart is true', function(done){
       var 
         uid1 = 'uid1',
