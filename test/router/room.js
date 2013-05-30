@@ -214,7 +214,15 @@ describe('/rooms', function(){
             expect(response.statusCode).to.be.equal(404);
             done();
           });
+      });
 
+      it('POST - should 400 if user is not specify', function(done){
+        request.post({ uri: usersUri, body: { } }, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(400);
+            done();
+          });
       });
 
       describe('/:userId', function(){
