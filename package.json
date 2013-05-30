@@ -17,15 +17,22 @@
   "devDependencies": {
     "mocha": "1.8.x",
     "expect.js": "0.2.x",
+    
     "express": "3.2.x",
-    "request":"2.x.x",
+    "request": "2.x.x",
     "socket.io": "0.9.x",
     "socket.io-client": "0.9.x",
-    "blanket": "1.1.4"
+
+    "blanket": "1.1.4",
+    "grunt": "~0.4.1",
+    "grunt-mocha-cov": "0.0.7",
+    "mocha-term-cov-reporter": "0.1.x"
   },
   "scripts": {
-    "blanket": { "pattern": "/lobby/lib/" },
-    "test": "mocha test/ -R spec"
+    "blanket": {
+      "pattern": "/lobby/lib/"
+    },
+    "test": "./node_modules/.bin/grunt test"
   },
   "repository": {
     "type": "git",
