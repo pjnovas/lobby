@@ -98,7 +98,8 @@ describe('/rooms', function(){
       createRoom({
         uid: owner,
         config: {
-          seats: seats
+          seats: seats,
+          my: 'property'
         }
       },function(rId){
         roomId = rId;
@@ -115,6 +116,7 @@ describe('/rooms', function(){
 
         expect(response.body).to.be.an('object');
         expect(response.body.id).to.be.equal(roomId);
+        expect(response.body.my).to.be.equal('property');
         done();     
       });
 
@@ -128,6 +130,52 @@ describe('/rooms', function(){
         done();     
       });
 
+    });
+
+    it('POST - should not be allowed', function(done){
+      
+      request.post(uri, function (error, response, body) {
+        expect(error).to.not.be.ok();
+        expect(response.statusCode).to.be.equal(405);
+        
+        expect(response.headers).to.have.property('allow');
+        expect(response.headers['allow']).to.be.equal('GET,PUT,DELETE');
+
+        done();
+      });
+
+    });
+
+    it('PUT - should be able to update room properties', function(done){
+
+      request.put({ uri: uri, body: {
+        uid: owner,
+        id: 'newId', //should not be replaced
+        my: 'new-property'
+      }}, function (error, response, body) {
+        expect(error).to.not.be.ok();
+        expect(response.statusCode).to.be.equal(200);
+
+        expect(response.body).to.be.an('object');
+        expect(response.body.id).to.not.be.equal('newId');
+        expect(response.body.id).to.be.equal(roomId);
+        expect(response.body.my).to.be.equal('new-property');
+        done();     
+      });
+    });
+
+    it('PUT - should NOT be allowed to update room properties other than the owner', function(done){
+
+      request.put({ uri: uri, body: {
+        uid: 'uidXX',
+        id: 'newId', //should not be replaced
+        my: 'new-property'
+      }}, function (error, response, body) {
+        expect(error).to.not.be.ok();
+        expect(response.statusCode).to.be.equal(403);
+
+        done();     
+      });
     });
 
     it('DELETE - should remove a room', function(done){
@@ -146,37 +194,6 @@ describe('/rooms', function(){
         expect(error).to.not.be.ok();
         expect(response.statusCode).to.be.equal(404);
         done();     
-      });
-
-    });
-
-    it('POST - should not be allowed', function(done){
-    
-      request.post(uri, function (error, response, body) {
-        expect(error).to.not.be.ok();
-        expect(response.statusCode).to.be.equal(405);
-        
-        expect(response.headers).to.have.property('allow');
-        expect(response.headers['allow']).to.be.equal('GET,DELETE');
-
-        done();
-      });
-
-    });
-
-    it('PUT - should be able to update room properties');
-    it('PUT - should be able to start a room ONLY by Owner if not a system or queue');
-
-    it('PUT - should not be allowed', function(done){
-    
-      request.put(uri, function (error, response, body) {
-        expect(error).to.not.be.ok();
-        expect(response.statusCode).to.be.equal(405);
-        
-        expect(response.headers).to.have.property('allow');
-        expect(response.headers['allow']).to.be.equal('GET,DELETE');
-
-        done();
       });
 
     });
