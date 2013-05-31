@@ -164,6 +164,9 @@ describe('/rooms', function(){
 
     });
 
+    it('PUT - should be able to update room properties');
+    it('PUT - should be able to start a room ONLY by Owner if not a system or queue');
+
     it('PUT - should not be allowed', function(done){
     
       request.put(uri, function (error, response, body) {

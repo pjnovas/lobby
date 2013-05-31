@@ -177,14 +177,14 @@ describe('Lobby', function(){
     roomFull = false;
     expect(userJoined).to.be.equal(true);
     userJoined = false;
-    expect(room.status).to.be.equal(roomStatus.READY);
+    expect(room.status).to.be.equal(roomStatus.FULL);
 
     // 9. Run a Queue with same config as first one: seats = 3
     var room1_2 = lobby.queue('uid5', {
       seats: 3
     });
 
-    // 10. A new queue is created, since the last one was full (READY)
+    // 10. A new queue is created, since the last one was full
     expect(lobby.rooms.length).to.be.equal(lenFirstAfter + 2);
     expect(room1_2.id).to.not.be.equal(room.id);
     expect(room1_2.id).to.not.be.equal(roomX.id);

@@ -68,10 +68,9 @@ module.exports = function(lobby){
 
                 client_uid1.disconnect();
                 client_uid2.disconnect();
-
                 room.clear();
-
                 done(); 
+
               }, 50);
             });
           });
@@ -136,7 +135,10 @@ module.exports = function(lobby){
                   expect(fireDisconnect).to.be.equal(true);
                   expect(fireLeave).to.be.equal(true);
 
-                  done(); 
+                  client_uid1.disconnect();
+                  client_uid2.disconnect();
+                  room.clear();
+                  done();
 
                 }, 50);
 
@@ -183,12 +185,84 @@ module.exports = function(lobby){
           setTimeout(function(){
 
             expect(fireFull).to.be.equal(true);
-            done(); 
+            client_uid1.disconnect();
+            done();
 
           }, 50);
 
         });
 
+      });
+
+    });
+
+    it('should emit when a room is ready', function(done){
+      var 
+        uid1 = 'uid1',
+        uid2 = 'uid2',
+        uid3 = 'uid3',
+        fireReady = 0,
+        fireStart = 0;
+
+      var room = lobby.create({
+        seats: 3
+      });
+
+      room.join(uid1);
+
+      var client_uid1 = io.connect(socketURL, options);
+      var client_uid2;
+      var client_uid3;
+      
+      client_uid1.on('room:ready',function(){
+        fireReady++;
+      });
+
+      client_uid1.on('room:start',function(){
+        fireStart++;
+      });
+
+      function connectUser(client, uid, done){
+        client.on('connect',function(err, data){
+          expect(err).to.not.be.ok();
+
+          client.emit('room:user:connect', {
+            userId: uid,
+            roomId: room.id
+          }, done);
+        });
+      }
+
+      connectUser(client_uid1, uid1, function(){
+
+        room.join(uid2);
+        room.join(uid3);
+
+        expect(fireReady).to.be.equal(0);
+
+        client_uid2 = io.connect(socketURL, options);
+        connectUser(client_uid2, uid2, function(){
+          
+          expect(fireReady).to.be.equal(0);
+
+          client_uid3 = io.connect(socketURL, options);
+          connectUser(client_uid3, uid3, function(){
+
+            setTimeout(function(){
+
+              expect(fireReady).to.be.equal(1);
+              expect(fireStart).to.be.equal(0);
+              
+              client_uid1.disconnect();
+              client_uid2.disconnect();
+              client_uid3.disconnect();
+              
+              room.clear();
+              done(); 
+
+            }, 50);
+          });
+        });
       });
 
     });
@@ -223,8 +297,11 @@ module.exports = function(lobby){
           setTimeout(function(){
 
             expect(fireDestroy).to.be.equal(true);
-            done(); 
 
+            client_uid1.disconnect();
+            room.clear();
+            done(); 
+            
           }, 50);
 
         });
@@ -236,7 +313,7 @@ module.exports = function(lobby){
     it('should throw an error if the room is not found on join', function(done){
       var 
         uid1 = 'uid1',
-        fakeRoomId = 12568;
+        fakeRoomId = 'xxxxx';
 
       var client_uid1 = io.connect(socketURL, options);
 
@@ -250,6 +327,7 @@ module.exports = function(lobby){
           expect(err).to.be.ok();
           expect(err.code).to.be.equal('RoomNotFound');
 
+          client_uid1.disconnect();
           done();
         });
 
@@ -277,6 +355,7 @@ module.exports = function(lobby){
           expect(err).to.be.ok();
           expect(err.code).to.be.equal('UserNotFound');
 
+          client_uid1.disconnect();
           done();
         });
 
@@ -284,7 +363,7 @@ module.exports = function(lobby){
 
     });
 
-    it('should emit start when a room is full and autostart is true', function(done){
+    it('should emit start when a room is full and startOnFull is true', function(done){
       var 
         uid1 = 'uid1',
         uid2 = 'uid2',
@@ -293,7 +372,7 @@ module.exports = function(lobby){
 
       var room = lobby.create({
         seats: 3,
-        autoStart: true
+        startOnFull: true
       });
 
       room.join(uid1);
@@ -318,12 +397,81 @@ module.exports = function(lobby){
           setTimeout(function(){
 
             expect(fireStart).to.be.equal(true);
+
+            client_uid1.disconnect();
             done(); 
 
           }, 50);
 
         });
 
+      });
+
+    });
+
+    it('should emit start when a room is full and startOnReady is true', function(done){
+      var 
+        uid1 = 'uid1',
+        uid2 = 'uid2',
+        uid3 = 'uid3',
+        fireReady = 0,
+        fireStart = 0;
+
+      var room = lobby.create({
+        seats: 3,
+        startOnReady: true
+      });
+
+      room.join(uid1);
+
+      var client_uid1 = io.connect(socketURL, options);
+      var client_uid2;
+      var client_uid3;
+      
+      client_uid1.on('room:ready',function(){
+        fireReady++;
+      });
+
+      client_uid1.on('room:start',function(){
+        fireStart++;
+      });
+
+      function connectUser(client, uid, done){
+        client.on('connect',function(err, data){
+          expect(err).to.not.be.ok();
+
+          client.emit('room:user:connect', {
+            userId: uid,
+            roomId: room.id
+          }, done);
+        });
+      }
+
+      connectUser(client_uid1, uid1, function(){
+
+        room.join(uid2);
+        room.join(uid3);
+
+        client_uid2 = io.connect(socketURL, options);
+        connectUser(client_uid2, uid2, function(){
+  
+          client_uid3 = io.connect(socketURL, options);
+          connectUser(client_uid3, uid3, function(){
+
+            setTimeout(function(){
+
+              expect(fireReady).to.be.equal(1);
+              expect(fireStart).to.be.equal(1);
+              
+              client_uid1.disconnect();
+              client_uid2.disconnect();
+              client_uid3.disconnect();
+              room.clear();
+              done(); 
+
+            }, 50);
+          });
+        });
       });
 
     });

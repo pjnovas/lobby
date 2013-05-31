@@ -65,7 +65,6 @@ describe('Room', function(){
       fullCalled = false;
 
     expect(room.freeSeats()).to.be(seats);
-    expect(room.autoStart).to.be(false);
 
     room.on('user:join', function(){
       joinCalls++;
@@ -241,7 +240,9 @@ describe('Room', function(){
     expect(found.id).to.be.equal(rid);
   });
 
-  it('should fire an start event after the room is full and auto-start is true', function(){
+  it('should allow to set time for self-destroying');
+
+  it('should fire an start event after the room is full and startOnFull is true', function(){
     var idx = 0,
       joinCalls = 0,
       fullCalled = false,
@@ -249,7 +250,7 @@ describe('Room', function(){
 
     var room = roomManager.create({
       seats: seats,
-      autoStart: true
+      startOnFull: true
     });
 
     expect(room.freeSeats()).to.be(seats);
@@ -294,6 +295,8 @@ describe('Room', function(){
     var room = roomManager.create({
       seats: seats
     });
+
+    expect(room.startOnFull).to.be.equal(false);
 
     room.on('room:start', function(){
       expect(idx).to.be.equal(seats);
@@ -361,7 +364,7 @@ describe('Room', function(){
     });
 
     expect(startCalls).to.be.equal(false);
-    expect(room.status).to.be.equal(roomStatus.READY);
+    expect(room.status).to.be.equal(roomStatus.FULL);
 
     room.start('uid1');
     expect(startCalls).to.be.equal(true);
