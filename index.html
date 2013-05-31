@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Lobby by pjnovas</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Lobby</h1>
+        <p>Room factory of Users for NodeJS with optional built-in Express routes and SocketIO events</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/pjnovas/lobby" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/pjnovas/lobby/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/pjnovas/lobby/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <p><strong>Lobby</strong> was created to manage rooms of players for games, like a <em>lobby</em> where players met before start a match between them, but it could be used for every grouping of users you need. It works as a library for your server, and optionally as a plugin to enable routes on your Express server and even websockets for your SocketIO server.</p>
+
+<p>It's divided in 3 modules:  </p>
+
+<ol>
+<li>A manager for rooms and users<br>
+</li>
+<li>A plugin to enable Express Routes<br>
+</li>
+<li>A plugin to enable SocketIO events<br>
+</li>
+</ol><h2>
+<a name="requeriments" class="anchor" href="#requeriments"><span class="octicon octicon-link"></span></a>Requeriments</h2>
+
+<p>Required: NodeJS 0.8+<br>
+Optional: Express Server<br>
+Optional: SocketIO Server  </p>
+
+<h2>
+<a name="getting-started" class="anchor" href="#getting-started"><span class="octicon octicon-link"></span></a>Getting started</h2>
+
+<pre><code>npm install lobby --save-dev
+</code></pre>
+
+<h2>
+<a name="room-manager" class="anchor" href="#room-manager"><span class="octicon octicon-link"></span></a>Room Manager</h2>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Lobby</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">myLobby</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Lobby</span><span class="p">();</span>
+</pre></div>
+
+<h3>
+<a name="methods" class="anchor" href="#methods"><span class="octicon octicon-link"></span></a>Methods</h3>
+
+<p><code>create(room_config)</code>: create a room and return it.<br><code>queue(user_id, room_config)</code>: find or create a room queue with the config, joins the user and return it.<br><code>getById(room_id)</code>: find and return a room by id.<br><code>destroy(room)</code>: if a room is send will remove it, otherwise will destroy the manager.<br><code>router(express_app)</code>: initialize the plugin appending room routes to the express app.<br><code>events(socket_io_app)</code>: initialize the real time plugin appending a <code>/rooms</code> namespace with events.<br><code>error</code>: expose all Lobby Errors that could happen.</p>
+
+<h3>
+<a name="events" class="anchor" href="#events"><span class="octicon octicon-link"></span></a>Events</h3>
+
+<p><code>room:create</code>: a room has been created<br><code>room:destroy</code>: a room has been destroyed</p>
+
+<h2>
+<a name="room" class="anchor" href="#room"><span class="octicon octicon-link"></span></a>Room</h2>
+
+<h3>
+<a name="create-rooms" class="anchor" href="#create-rooms"><span class="octicon octicon-link"></span></a>Create Rooms</h3>
+
+<p>Lobby is going to take care of managing rooms and users for you, so you will ask for a room first: </p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">newRoom</span> <span class="o">=</span> <span class="nx">myLobby</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+  <span class="c1">//room options</span>
+  <span class="nx">seats</span><span class="o">:</span> <span class="mi">5</span>
+<span class="p">});</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">newRoom</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span> <span class="c1">//something like "hhdpzwll"</span>
+</pre></div>
+
+<p>Every room is going to have an unique id which is generated by the manager.</p>
+
+<h3>
+<a name="room-options" class="anchor" href="#room-options"><span class="octicon octicon-link"></span></a>Room Options</h3>
+
+<p><code>seats</code> <em><strong>Number</strong></em> amount of users allowed to join (default: <code>2</code>)<br><code>owner</code> <em><strong>Number String</strong></em> a user id to set as the owner (default: <code>'system'</code>)<br><code>autoDestroy</code> <em><strong>Boolean</strong></em> self-destroy when it's empty of users (default: <code>true</code>)<br><code>startOnFull</code> <em><strong>Boolean</strong></em> fires start event when it's full of users (default: <code>false</code>)<br><code>startOnReady</code> <em><strong>Boolean</strong></em> fires start event when it's full and all users are connected (ready). Used with the plugin of WebSockets (default: <code>false</code>)<br><strong>Also any property:value you want to store, it will be untouched.</strong></p>
+
+<h3>
+<a name="room-methods" class="anchor" href="#room-methods"><span class="octicon octicon-link"></span></a>Room Methods</h3>
+
+<p><code>join(user_or_user_id)</code>: join a user to the room<br><code>leave(user_or_user_id)</code>: removes a user from the room<br><code>update(json_properties)</code>: update your own room properties<br><code>start(user_or_user_id)</code>: start the room, if an owner was specify it must be sent by parameter<br><code>has(user_or_user_id)</code>: returns true or false if the user is in the room<br><code>isFull()</code>: returns true if the room has the same users joined as seats configured<br><code>isEmpty()</code>: returns true if the room has no users in it<br><code>freeSeats()</code>: returns Number of how many seats are left<br><code>clear()</code>: removes all users<br><code>toJSON()</code>: returns a JSON representation of the room<br><code>destroy()</code>: destroy the room  </p>
+
+<h3>
+<a name="room-events" class="anchor" href="#room-events"><span class="octicon octicon-link"></span></a>Room Events</h3>
+
+<p>You can listen to events of a room to know what is happening and when:</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">room</span> <span class="o">=</span> <span class="nx">myLobby</span><span class="p">.</span><span class="nx">create</span><span class="p">({</span>
+  <span class="nx">seats</span><span class="o">:</span> <span class="mi">2</span>
+<span class="p">});</span>
+
+<span class="nx">room</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"user:join"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">user</span><span class="p">){</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"User with %s has joined room %s"</span><span class="p">,</span> <span class="nx">user</span><span class="p">.</span><span class="nx">id</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">room</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">"room:full"</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Room %s is now full!"</span><span class="p">,</span> <span class="k">this</span><span class="p">.</span><span class="nx">id</span><span class="p">);</span>
+<span class="p">});</span>
+
+<span class="nx">room</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'userId-1'</span><span class="p">);</span>
+<span class="nx">room</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'userId-2'</span><span class="p">);</span>
+</pre></div>
+
+<h4>
+<a name="events-1" class="anchor" href="#events-1"><span class="octicon octicon-link"></span></a>Events</h4>
+
+<p><code>user:join</code>: a user joined<br><code>user:leave</code>: a user left<br><code>room:full</code>: the room is full<br><code>room:empty</code>: the room is empty<br><code>room:start</code>: the room started<br><code>room:clear</code>: the room was cleared<br><code>room:destroy</code>: room destroyed  </p>
+
+<h3>
+<a name="room-queues" class="anchor" href="#room-queues"><span class="octicon octicon-link"></span></a>Room Queues</h3>
+
+<p>Optionally you can get room queue, so you can have your rooms configurations and leave the Manager to retrieve a found one or create a new one.</p>
+
+<div class="highlight"><pre><span class="c1">// creates a new room</span>
+<span class="kd">var</span> <span class="nx">room2Seats</span> <span class="o">=</span> <span class="nx">myLobby</span><span class="p">.</span><span class="nx">queue</span><span class="p">(</span><span class="s1">'userId-1'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">seats</span><span class="o">:</span> <span class="mi">2</span>
+<span class="p">});</span>
+
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">room2Seats</span><span class="p">.</span><span class="nx">owner</span><span class="p">);</span> <span class="c1">// 'queue'</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">room2Seats</span><span class="p">.</span><span class="nx">has</span><span class="p">(</span><span class="s1">'userId-1'</span><span class="p">));</span> <span class="c1">// true</span>
+
+<span class="c1">// creates a new room</span>
+<span class="kd">var</span> <span class="nx">room2SeatsAndAwesome</span> <span class="o">=</span> <span class="nx">myLobby</span><span class="p">.</span><span class="nx">queue</span><span class="p">(</span><span class="s1">'userId-2'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">seats</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="nx">awesome</span><span class="o">:</span> <span class="kc">true</span>
+<span class="p">});</span>
+
+<span class="c1">// retrieves the first room</span>
+<span class="kd">var</span> <span class="nx">same_as_room2Seats</span> <span class="o">=</span> <span class="nx">myLobby</span><span class="p">.</span><span class="nx">queue</span><span class="p">(</span><span class="s1">'userId-3'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">seats</span><span class="o">:</span> <span class="mi">2</span>
+<span class="p">});</span>
+
+<span class="c1">// retrieves the second room</span>
+<span class="kd">var</span> <span class="nx">same_as_room2SeatsAndAwesome</span> <span class="o">=</span> <span class="nx">myLobby</span><span class="p">.</span><span class="nx">queue</span><span class="p">(</span><span class="s1">'userId-4'</span><span class="p">,</span> <span class="p">{</span>
+  <span class="nx">seats</span><span class="o">:</span> <span class="mi">2</span><span class="p">,</span>
+  <span class="nx">awesome</span><span class="o">:</span> <span class="kc">true</span>
+<span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="room-manager---router-express" class="anchor" href="#room-manager---router-express"><span class="octicon octicon-link"></span></a>Room Manager - Router (Express)</h2>
+
+<p>Add routes to an express application.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Lobby</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">myLobby</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Lobby</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">app</span> <span class="o">=</span> <span class="nx">express</span><span class="p">();</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">bodyParser</span><span class="p">());</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">express</span><span class="p">.</span><span class="nx">methodOverride</span><span class="p">());</span>
+<span class="nx">app</span><span class="p">.</span><span class="nx">use</span><span class="p">(</span><span class="nx">app</span><span class="p">.</span><span class="nx">router</span><span class="p">);</span>
+
+<span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">app</span><span class="p">).</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span>
+
+<span class="nx">myLobby</span><span class="p">.</span><span class="nx">router</span><span class="p">(</span><span class="nx">app</span><span class="p">);</span>
+</pre></div>
+
+<h3>
+<a name="routes" class="anchor" href="#routes"><span class="octicon octicon-link"></span></a>Routes</h3>
+
+<p><code>GET</code><code>/rooms</code> Retrieve all current created rooms.<br><code>POST</code><code>/rooms</code> Create a room and retrieves a JSON representation of it.<br><code>POST</code><code>/rooms/queues</code> Finds or Create a room queue and retrieves a JSON representation of it.  </p>
+
+<p><code>GET</code><code>/rooms/:roomId</code> Retrieves a room by its id.<br><code>PUT</code><code>/rooms/:roomId</code> Updates a rooms properties (same as room.update()).<br><code>DELETE</code><code>/rooms/:roomId</code> Destroy a room.  </p>
+
+<p><code>POST</code><code>/rooms/:roomId/users</code> Join a user to a room.<br><code>DELETE</code><code>/rooms/:roomId/users/:userId</code> Remove (leave) a user from a room.  </p>
+
+<h2>
+<a name="room-manager---events-socketio" class="anchor" href="#room-manager---events-socketio"><span class="octicon octicon-link"></span></a>Room Manager - Events (SocketIO)</h2>
+
+<p>A socketio namespace named <code>/rooms</code> will be created for lobby events.</p>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Lobby</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">express</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'express'</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">socketIO</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'socket.io'</span><span class="p">)</span>
+  <span class="p">,</span> <span class="nx">http</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'http'</span><span class="p">);</span>
+
+<span class="kd">var</span> <span class="nx">myLobby</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Lobby</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">server</span> <span class="o">=</span> <span class="nx">http</span><span class="p">.</span><span class="nx">createServer</span><span class="p">(</span><span class="nx">app</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">io</span> <span class="o">=</span> <span class="nx">socketIO</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="nx">server</span><span class="p">);</span>
+<span class="nx">server</span><span class="p">.</span><span class="nx">listen</span><span class="p">(</span><span class="mi">3000</span><span class="p">);</span>
+
+<span class="nx">myLobby</span><span class="p">.</span><span class="nx">events</span><span class="p">(</span><span class="nx">io</span><span class="p">);</span>
+</pre></div>
+
+<h3>
+<a name="client-events-to-listen" class="anchor" href="#client-events-to-listen"><span class="octicon octicon-link"></span></a>Client Events to listen:</h3>
+
+<p><code>room:user:join</code> a user joined the room<br><code>room:user:leave</code> a user left the room<br><code>room:user:connect</code> a user connected to the room<br><code>room:user:disconnect</code> a user disconnected from the room  </p>
+
+<p><code>room:full</code> the room is now full<br><code>room:ready</code> the room is ready, every user joined is now connected<br><code>room:start</code> the room has started<br><code>room:destroy</code> the room has been canceled  </p>
+
+<h3>
+<a name="client-events-to-emit" class="anchor" href="#client-events-to-emit"><span class="octicon octicon-link"></span></a>Client Events to emit:</h3>
+
+<p><code>room:user:connect</code> emit once the user has joined the room to connect to it.<br><code>room:user:disconnect</code> emit when the user disconnect from the room.  </p>
+
+<h3>
+<a name="client-example" class="anchor" href="#client-example"><span class="octicon octicon-link"></span></a>Client Example</h3>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">socket</span> <span class="o">=</span> <span class="nx">io</span><span class="p">.</span><span class="nx">connect</span><span class="p">(</span><span class="s1">'http://localhost:3000/rooms'</span><span class="p">);</span>
+<span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'connect'</span><span class="p">,</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+  <span class="nx">socket</span><span class="p">.</span><span class="nx">emit</span><span class="p">(</span><span class="s1">'room:user:connect'</span><span class="p">,</span> <span class="p">{</span>
+    <span class="nx">roomId</span><span class="o">:</span> <span class="s1">'xxxx'</span><span class="p">,</span>
+    <span class="nx">userId</span><span class="o">:</span> <span class="s1">'yyyy'</span>
+  <span class="p">},</span> <span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">,</span> <span class="nx">users</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">return</span> <span class="k">throw</span> <span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'something went wrong! '</span> <span class="o">+</span> <span class="nx">err</span><span class="p">.</span><span class="nx">message</span><span class="p">);</span>
+    <span class="p">}</span>
+
+    <span class="nx">console</span><span class="p">.</span><span class="nx">dir</span><span class="p">(</span><span class="nx">users</span><span class="p">);</span>
+
+    <span class="nx">socket</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">'room:ready'</span><span class="p">,</span> <span class="kd">function</span><span class="p">(){</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'Room ready!, lets start!'</span><span class="p">);</span>
+    <span class="p">});</span>
+  <span class="p">});</span>
+<span class="p">});</span>
+</pre></div>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/pjnovas">pjnovas</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
