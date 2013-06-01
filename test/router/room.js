@@ -10,8 +10,8 @@ describe('/rooms', function(){
   
   var uri = baseURL + '/rooms';
 
-  function createRoom(rconfig, done){
-    request.post({ uri: uri, body: rconfig }, function (error, response, body) {
+  function createRoom(uid, rconfig, done){
+    request.post({ uri: uri, headers: { user: uid }, body: rconfig }, function (error, response, body) {
       done(response.body.id);
     });
   }
@@ -30,14 +30,12 @@ describe('/rooms', function(){
 
   it('POST - should create a room, add the owner and retrieve it', function(done){
     
+    var uid = 'uid1';
     var reqBody = {
-      uid: 'uid1',
-      config: {
-        seats: 4
-      }
+      seats: 4
     };
 
-    request.post({ uri: uri, body: reqBody }, 
+    request.post({ uri: uri, headers: { user: uid }, body: reqBody }, 
       function (error, response, body) {
         expect(error).to.not.be.ok();
         expect(response.statusCode).to.be.equal(200);
@@ -58,34 +56,6 @@ describe('/rooms', function(){
 
   });
 
-  it('PUT - should not be allowed', function(done){
-    
-    request.put(uri, function (error, response, body) {
-      expect(error).to.not.be.ok();
-      expect(response.statusCode).to.be.equal(405);
-      
-      expect(response.headers).to.have.property('allow');
-      expect(response.headers['allow']).to.be.equal('GET,POST');
-
-      done();
-    });
-
-  });
-
-  it('DELETE - should not be allowed', function(done){
-    
-    request.del(uri, function (error, response, body) {
-      expect(error).to.not.be.ok();
-      expect(response.statusCode).to.be.equal(405);
-      
-      expect(response.headers).to.have.property('allow');
-      expect(response.headers['allow']).to.be.equal('GET,POST');
-
-      done();
-    });
-
-  });
-
   describe('/:roomId', function(){
   
     var baseURI = baseURL + '/rooms',
@@ -95,12 +65,9 @@ describe('/rooms', function(){
       roomId;
 
     before(function(done){
-      createRoom({
-        uid: owner,
-        config: {
-          seats: seats,
-          my: 'property'
-        }
+      createRoom(owner, {
+        seats: seats,
+        my: 'property'
       },function(rId){
         roomId = rId;
         uri += '/' + roomId;
@@ -132,24 +99,9 @@ describe('/rooms', function(){
 
     });
 
-    it('POST - should not be allowed', function(done){
-      
-      request.post(uri, function (error, response, body) {
-        expect(error).to.not.be.ok();
-        expect(response.statusCode).to.be.equal(405);
-        
-        expect(response.headers).to.have.property('allow');
-        expect(response.headers['allow']).to.be.equal('GET,PUT,DELETE');
-
-        done();
-      });
-
-    });
-
     it('PUT - should be able to update room properties', function(done){
 
-      request.put({ uri: uri, body: {
-        uid: owner,
+      request.put({ uri: uri, headers: { user: owner }, body: {
         id: 'newId', //should not be replaced
         my: 'new-property'
       }}, function (error, response, body) {
@@ -166,8 +118,7 @@ describe('/rooms', function(){
 
     it('PUT - should NOT be allowed to update room properties other than the owner', function(done){
 
-      request.put({ uri: uri, body: {
-        uid: 'uidXX',
+      request.put({ uri: uri, headers: { user: 'uidXX' }, body: {
         id: 'newId', //should not be replaced
         my: 'new-property'
       }}, function (error, response, body) {
@@ -204,11 +155,8 @@ describe('/rooms', function(){
       var uid = 'uid2';
 
       before(function(done){
-        createRoom({
-          uid: owner,
-          config: {
-            seats: seats
-          }
+        createRoom(owner, {
+          seats: seats
         },function(roomId){
           uri += '/' + roomId;
           usersUri = uri + '/users';
@@ -218,17 +166,16 @@ describe('/rooms', function(){
 
 
       it('POST - should join a user to the room', function(done){
-        request.post({ uri: usersUri, body: { uid: uid } }, 
+        request.post({ uri: usersUri, headers: { user: uid }}, 
           function (error, response, body) {
             expect(error).to.not.be.ok();
             expect(response.statusCode).to.be.equal(204);
             done();
           });
-
       });
 
       it('POST - should 404 if no room is found', function(done){
-        request.post({ uri: baseURI + '/rooms/555/users', body: { uid: uid } }, 
+        request.post({ uri: baseURI + '/rooms/555/users', headers: { user: uid }}, 
           function (error, response, body) {
             expect(error).to.not.be.ok();
             expect(response.statusCode).to.be.equal(404);
@@ -237,7 +184,7 @@ describe('/rooms', function(){
       });
 
       it('POST - should 400 if user is not specify', function(done){
-        request.post({ uri: usersUri, body: { } }, 
+        request.post({ uri: usersUri }, 
           function (error, response, body) {
             expect(error).to.not.be.ok();
             expect(response.statusCode).to.be.equal(400);
@@ -294,7 +241,7 @@ describe('/rooms', function(){
       lastRoomId;
 
     it('POST - should return a room queue with the user joined', function(done){
-      request.post({ uri: uri, body: { uid: uid, config:{ seats: seats }} }, 
+      request.post({ uri: uri, headers: { user: uid }, body: { seats: seats } }, 
         function (error, response, body) {
           expect(error).to.not.be.ok();
           expect(response.statusCode).to.be.equal(200);
@@ -315,7 +262,7 @@ describe('/rooms', function(){
     });
 
     it('POST - should return the previous room queue with the new user joined', function(done){
-      request.post({ uri: uri, body: { uid: uid2, config:{ seats: seats }} }, 
+      request.post({ uri: uri, headers: { user: uid2 }, body: { seats: seats } }, 
         function (error, response, body) {
           expect(error).to.not.be.ok();
           expect(response.statusCode).to.be.equal(200);

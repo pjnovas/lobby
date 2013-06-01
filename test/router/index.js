@@ -15,10 +15,27 @@ describe('Router', function(){
     server.close(done);
   });
 
+  it('should have a method router', function(){
+    expect(lobby.router).to.be.a('function');
+  });
+
   var app = createExpressApp();
 
   var lobby = new Lobby();
-  lobby.router(app);
+
+  it('should throw an error if no function is specify for requests', function(){
+    expect(function(){
+      lobby.router(app);
+    }).to.throwError('expected a function as second parameter of Lobby.router()');
+  });
+
+  lobby.router(app, function(req, res, next){
+    req.roomUser = {
+      id: req.get('user')
+    };
+
+    next();
+  });
   
   require('./room');
 });
