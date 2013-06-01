@@ -196,6 +196,57 @@ module.exports = function(lobby){
 
     });
 
+    it('should emit when a room is updated', function(done){
+      var 
+        uid1 = 'uid1',
+        fireUpdate = 0;
+
+      var room = lobby.create({
+        seats: 3,
+        custom: 1
+      });
+
+      room.join(uid1);
+
+      var client_uid1 = io.connect(socketURL, options);
+      
+      client_uid1.on('room:update',function(){
+        fireUpdate++;
+      });
+
+      function connectUser(client, uid, done){
+        client.on('connect',function(err, data){
+          expect(err).to.not.be.ok();
+
+          client.emit('room:user:connect', {
+            userId: uid,
+            roomId: room.id
+          }, done);
+        });
+      }
+
+      connectUser(client_uid1, uid1, function(){
+
+        expect(fireUpdate).to.be.equal(0);
+        room.update({
+          custom: 2
+        });
+
+        setTimeout(function(){
+
+          expect(room.custom).to.be.equal(2);
+          expect(fireUpdate).to.be.equal(1);
+          
+          client_uid1.disconnect();
+          
+          room.clear();
+          done(); 
+
+        }, 50);
+      });
+
+    });
+
     it('should emit when a room is ready', function(done){
       var 
         uid1 = 'uid1',

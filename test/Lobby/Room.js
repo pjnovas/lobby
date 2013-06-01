@@ -16,7 +16,8 @@ describe('Room', function(){
 
   var seats = 5;
   var room = roomManager.create({
-    seats: seats
+    seats: seats,
+    custom: 1
   });
 
   it('should validate user when joins or leaves a room', function(){
@@ -172,6 +173,24 @@ describe('Room', function(){
     expect(jsonRoom.users[1].id).to.be.equal(2);
 
     room.clear();
+  });
+
+  it('should allow to be updated', function(){
+    var emitted = false;
+
+    room.on('room:update', function(){
+      emitted = true;
+    });
+
+    expect(room.custom).to.be.equal(1);
+
+    var rid = room.id;
+    room.update({
+      custom: 2
+    });
+
+    expect(emitted).to.be.equal(true);
+    expect(room.custom).to.be.equal(2);
   });
 
   it('should allow to be destroyed', function(){
