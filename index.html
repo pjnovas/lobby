@@ -39,7 +39,7 @@
         <ul></ul>
       </nav>
       <section>
-        <p><strong>Lobby</strong> was created to manage rooms of players for games, like a <em>lobby</em> where players met before start a match between them, but it could be used for every grouping of users you need. It works as a library for your server, and optionally as a plugin to enable routes on your Express server and even websockets for your SocketIO server.</p>
+        <p><strong>Lobby</strong> was created to manage rooms of players for games, like a <em>lobby</em> where players met before start a match between them but it can be used for every grouping of users you need.</p>
 
 <p>It's divided in 3 modules:  </p>
 
@@ -105,7 +105,7 @@ Optional: SocketIO Server  </p>
 <h3>
 <a name="room-methods" class="anchor" href="#room-methods"><span class="octicon octicon-link"></span></a>Room Methods</h3>
 
-<p><code>join(user_or_user_id)</code>: join a user to the room<br><code>leave(user_or_user_id)</code>: removes a user from the room<br><code>update(json_properties)</code>: update your own room properties<br><code>start(user_or_user_id)</code>: start the room, if an owner was specify it must be sent by parameter<br><code>has(user_or_user_id)</code>: returns true or false if the user is in the room<br><code>isFull()</code>: returns true if the room has the same users joined as seats configured<br><code>isEmpty()</code>: returns true if the room has no users in it<br><code>freeSeats()</code>: returns Number of how many seats are left<br><code>clear()</code>: removes all users<br><code>toJSON()</code>: returns a JSON representation of the room<br><code>destroy()</code>: destroy the room  </p>
+<p><code>join (user_or_user_id)</code>: join a user to the room<br><code>leave (user_or_user_id)</code>: removes a user from the room<br><code>update (json_properties)</code>: update your own room properties<br><code>start (user_or_user_id)</code>: start the room, if an owner was specify it must be sent by parameter<br><code>has (user_or_user_id)</code>: returns true or false if the user is in the room<br><code>isFull ()</code>: returns true if the room has the same users joined as seats configured<br><code>isEmpty ()</code>: returns true if the room has no users in it<br><code>freeSeats ()</code>: returns Number of how many seats are left<br><code>clear ()</code>: removes all users<br><code>toJSON ()</code>: returns a JSON representation of the room<br><code>destroy ()</code>: destroy the room  </p>
 
 <h3>
 <a name="room-events" class="anchor" href="#room-events"><span class="octicon octicon-link"></span></a>Room Events</h3>
@@ -165,7 +165,7 @@ Optional: SocketIO Server  </p>
 </pre></div>
 
 <h2>
-<a name="room-manager---router-express" class="anchor" href="#room-manager---router-express"><span class="octicon octicon-link"></span></a>Room Manager - Router (Express)</h2>
+<a name="router-express" class="anchor" href="#router-express"><span class="octicon octicon-link"></span></a>Router (Express)</h2>
 
 <p>Add routes to an express application.</p>
 
@@ -195,7 +195,7 @@ Optional: SocketIO Server  </p>
 <p><code>POST</code><code>/rooms/:roomId/users</code> Join a user to a room.<br><code>DELETE</code><code>/rooms/:roomId/users/:userId</code> Remove (leave) a user from a room.  </p>
 
 <h2>
-<a name="room-manager---events-socketio" class="anchor" href="#room-manager---events-socketio"><span class="octicon octicon-link"></span></a>Room Manager - Events (SocketIO)</h2>
+<a name="events-socketio" class="anchor" href="#events-socketio"><span class="octicon octicon-link"></span></a>Events (SocketIO)</h2>
 
 <p>A socketio namespace named <code>/rooms</code> will be created for lobby events.</p>
 
@@ -245,6 +245,34 @@ Optional: SocketIO Server  </p>
     <span class="p">});</span>
   <span class="p">});</span>
 <span class="p">});</span>
+</pre></div>
+
+<h2>
+<a name="errors" class="anchor" href="#errors"><span class="octicon octicon-link"></span></a>Errors</h2>
+
+<p>This are the error Lobby will throw as known ones</p>
+
+<p><code>UserNotFound</code> <code>404</code><br><code>RoomNotFound</code> <code>404</code><br><code>UserAlreadyInRoom</code> <code>409</code><br><code>InvalidUserOrId</code> <code>400</code><br><code>InvalidRoomOrId</code> <code>400</code><br><code>RoomFull</code> <code>409</code><br><code>NotOwner</code> <code>403</code>  </p>
+
+<p>And can be found in <code>Lobby.error</code> namespace.  </p>
+
+<h3>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h3>
+
+<div class="highlight"><pre><span class="kd">var</span> <span class="nx">Lobby</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'lobby'</span><span class="p">);</span>
+<span class="kd">var</span> <span class="nx">aLobby</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Lobby</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">newRoom</span> <span class="o">=</span> <span class="nx">aLobby</span><span class="p">.</span><span class="nx">create</span><span class="p">();</span>
+<span class="nx">newRoom</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'uid1'</span><span class="p">);</span>
+
+<span class="k">try</span> <span class="p">{</span>
+  <span class="nx">newRoom</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">'uid1'</span><span class="p">);</span>  <span class="c1">//again</span>
+<span class="p">}</span>
+<span class="k">catch</span> <span class="p">(</span><span class="nx">e</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">e</span> <span class="k">instanceof</span> <span class="nx">Lobby</span><span class="p">.</span><span class="nx">error</span><span class="p">.</span><span class="nx">UserAlreadyInRoom</span><span class="p">){</span>
+    <span class="c1">// manage the problem</span>
+  <span class="p">}</span>
+<span class="p">}</span>
 </pre></div>
       </section>
       <footer>
