@@ -15,7 +15,21 @@ describe('Events', function(){
   var io = createExpressApp();
 
   var lobby = new Lobby();
-  lobby.events(io);
+
+  lobby.events(io, {
+    message: function(data, done){
+      if (data.invalid){
+        return done('error thrown');
+      }
+
+      done(null, {
+        xdata: data
+      });
+    },
+    other: function(data, done){
+      done(null, data);
+    }
+  });
 
   require('./room')(lobby);
 });
