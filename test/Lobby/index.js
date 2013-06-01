@@ -61,6 +61,15 @@ describe('Lobby', function(){
     expect(room).to.be.equal(lastRoom);
   });
 
+  it('should allow to get current rooms as an array', function(){
+    var rooms = lobby.getRooms();
+    
+    expect(rooms).to.be.an('array');
+    expect(rooms.length).to.be.equal(1);
+    expect(rooms[0].seats.total).to.be.a('number');
+    expect(rooms[0].seats.taken).to.be.a('number');
+  });
+
   it('should allow to destroy a room', function(){
     var emitted = false;
   

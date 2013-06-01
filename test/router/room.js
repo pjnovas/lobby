@@ -18,14 +18,25 @@ describe('/rooms', function(){
 
   it('GET - should retrieve all current rooms', function(done){
     
-    request.get(uri, function (error, response, body) {
-      expect(error).to.not.be.ok();
-      expect(response.statusCode).to.be.equal(200);
-      expect(response.body).to.be.an('array');
-      expect(response.body.length).to.be.equal(0);
-      done();     
-    });
+    createRoom('uid1', { seats: 15, custom: 2.5 }, function(rid){
 
+      request.get(uri, function (error, response, body) {
+        expect(error).to.not.be.ok();
+        expect(response.statusCode).to.be.equal(200);
+        
+        expect(response.body).to.be.an('array');
+        expect(response.body.length).to.be.equal(1);
+
+        var room = response.body[0];
+
+        expect(room.id).to.be.equal(rid);
+        expect(room.seats.total).to.be.equal(15);
+        expect(room.seats.taken).to.be.equal(1);
+        expect(room.custom).to.be.equal(2.5);
+
+        done();     
+      });
+    });
   });
 
   it('POST - should create a room, add the owner and retrieve it', function(done){
