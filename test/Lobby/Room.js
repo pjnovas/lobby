@@ -259,8 +259,6 @@ describe('Room', function(){
     expect(found.id).to.be.equal(rid);
   });
 
-  it('should allow to set time for self-destroying');
-
   it('should fire an start event after the room is full and startOnFull is true', function(){
     var idx = 0,
       joinCalls = 0,
