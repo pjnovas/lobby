@@ -160,6 +160,86 @@ describe('/rooms', function(){
 
     });
 
+    describe('/status/:status', function(){
+      var statusUri;
+      var uri = baseURL + '/rooms';
+      var uid = 'uid2';
+
+      before(function(done){
+        createRoom(owner, {
+          seats: 1
+        },function(roomId){
+          uri += '/' + roomId;
+          statusUri = uri + '/status';
+          done();
+        });
+      });
+
+      it('PUT - should allow to change the status to READY', function(done){
+        request.put({ uri: statusUri + '/ready', headers: { user: owner }}, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(204);
+            done();
+          });
+      });
+
+      it('PUT - should allow to change the status to STARTED', function(done){
+        request.put({ uri: statusUri + '/started', headers: { user: owner }}, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(204);
+            done();
+          });
+      });
+
+      it('PUT - should NOT allow to change the status if user not owner', function(done){
+        request.put({ uri: statusUri + '/started', headers: { user: uid }}, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(403);
+            done();
+          });
+      });
+
+      it('PUT - should NOT allow to change to status EMPTY', function(done){
+        request.put({ uri: statusUri + '/empty', headers: { user: owner }}, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(403);
+            done();
+          });
+      });
+
+      it('PUT - should NOT allow to change to status WAITING', function(done){
+        request.put({ uri: statusUri + '/waiting', headers: { user: owner }}, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(403);
+            done();
+          });
+      });
+
+      it('PUT - should NOT allow to change to status FULL', function(done){
+        request.put({ uri: statusUri + '/full', headers: { user: owner }}, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(403);
+            done();
+          });
+      });
+
+      it('PUT - should throw an error when the status was not found', function(done){
+        request.put({ uri: statusUri + '/notfound', headers: { user: owner }}, 
+          function (error, response, body) {
+            expect(error).to.not.be.ok();
+            expect(response.statusCode).to.be.equal(404);
+            done();
+          });
+      });
+
+    });
+
     describe('/users', function(){
       var usersUri;
       var uri = baseURL + '/rooms';

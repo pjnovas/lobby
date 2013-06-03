@@ -213,13 +213,15 @@ describe('Lobby', function(){
   });
 
   it('should expose all errors', function(){
-    expect(Lobby.error.UserNotFound).to.be(require('../../lib/errors/UserNotFound'))
-    expect(Lobby.error.RoomNotFound).to.be(require('../../lib/errors/RoomNotFound'))
-    expect(Lobby.error.UserAlreadyInRoom).to.be(require('../../lib/errors/UserAlreadyInRoom'))
-    expect(Lobby.error.InvalidUserOrId).to.be(require('../../lib/errors/InvalidUserOrId'))
-    expect(Lobby.error.InvalidRoomOrId).to.be(require('../../lib/errors/InvalidRoomOrId'))
-    expect(Lobby.error.RoomFull).to.be(require('../../lib/errors/RoomFull'))
-    expect(Lobby.error.NotOwner).to.be(require('../../lib/errors/NotOwner'))
+    expect(Lobby.error.UserNotFound).to.be(require('../../lib/errors/UserNotFound'));
+    expect(Lobby.error.RoomNotFound).to.be(require('../../lib/errors/RoomNotFound'));
+    expect(Lobby.error.UserAlreadyInRoom).to.be(require('../../lib/errors/UserAlreadyInRoom'));
+    expect(Lobby.error.InvalidUserOrId).to.be(require('../../lib/errors/InvalidUserOrId'));
+    expect(Lobby.error.InvalidRoomOrId).to.be(require('../../lib/errors/InvalidRoomOrId'));
+    expect(Lobby.error.RoomFull).to.be(require('../../lib/errors/RoomFull'));
+    expect(Lobby.error.NotOwner).to.be(require('../../lib/errors/NotOwner'));
+    expect(Lobby.error.RoomStatusNotFound).to.be(require('../../lib/errors/RoomStatusNotFound'));
+    expect(Lobby.error.RoomStatusNotAllowed).to.be(require('../../lib/errors/RoomStatusNotAllowed'));
   });
 
   it('should allow to be destroyed', function(){

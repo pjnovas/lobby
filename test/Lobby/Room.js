@@ -355,18 +355,17 @@ describe('Room', function(){
     room.removeAllListeners('room:start');
   });
 
-  it('should only allow owner (if is specified) to run a room start when autostart is false', function(){
+  it('should change the state to READY and fire ready event when ready() is called', function(){
     var idx = 0,
-      startCalls = false;
+      readyCalls = false;
 
     var room = roomManager.create({
-      seats: seats,
-      owner: 'uid1'
+      seats: seats
     });
 
-    room.on('room:start', function(){
+    room.on('room:ready', function(){
       expect(idx).to.be.equal(seats);
-      startCalls = true;
+      readyCalls = true;
     });
 
     _.times(5, function(i){
@@ -374,19 +373,12 @@ describe('Room', function(){
       room.join(i+1);
     });
 
-    expect(function(){
-      room.start();
-    }).to.throwError(function (e) {
-      expect(e).to.be.a(NotOwnerError);
-    });
+    expect(readyCalls).to.be.equal(false);
 
-    expect(startCalls).to.be.equal(false);
-    expect(room.status).to.be.equal(roomStatus.FULL);
-
-    room.start('uid1');
-    expect(startCalls).to.be.equal(true);
-    expect(room.status).to.be.equal(roomStatus.STARTED);
-    room.removeAllListeners('room:start');
+    room.ready();
+    expect(readyCalls).to.be.equal(true);
+    expect(room.status).to.be.equal(roomStatus.READY);
+    room.removeAllListeners('room:ready');
   });
 
 });
