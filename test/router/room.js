@@ -329,6 +329,7 @@ describe('/rooms', function(){
       seats = 3,
       uid = 'uid5',
       uid2 = 'uid6',
+      uid3 = 'uid7',
       lastRoomId;
 
     it('POST - should return a room queue with the user joined', function(done){
@@ -371,6 +372,61 @@ describe('/rooms', function(){
           expect(room.users[1].id).to.be.equal(uid2);
 
           done();
+        });
+    });
+
+    it('POST - should return the previous room queue with the same user joined', function(done){
+      request.post({ uri: uri, headers: { user: uid2 }, body: { seats: seats } }, 
+        function (error, response, body) {
+          expect(error).to.not.be.ok();
+          expect(response.statusCode).to.be.equal(200);
+
+          expect(response.body).to.be.an('object');
+        
+          var room = response.body;
+
+          expect(room.id).to.be.equal(lastRoomId);
+          expect(room.owner).to.be.equal('queue');
+          expect(room.seats.total).to.be.equal(3);
+          expect(room.seats.taken).to.be.equal(2);
+
+          expect(room.users[0].id).to.be.equal(uid);
+          expect(room.users[1].id).to.be.equal(uid2);
+
+          done();
+        });
+    });
+
+    it('POST - should return the same room if the queue is full but user has joined', function(done){
+      request.post({ uri: uri, headers: { user: uid3 }, body: { seats: seats } }, 
+        function (error, response, body) {
+          expect(error).to.not.be.ok();
+          expect(response.statusCode).to.be.equal(200);
+
+          expect(response.body).to.be.an('object');
+        
+          var room = response.body;
+
+          expect(room.id).to.be.equal(lastRoomId);
+          expect(room.owner).to.be.equal('queue');
+
+          expect(room.seats.total).to.be.equal(3);
+          expect(room.seats.taken).to.be.equal(3);
+
+          request.post({ uri: uri, headers: { user: uid3 }, body: { seats: seats } }, 
+            function (error, response, body) {
+              expect(error).to.not.be.ok();
+              expect(response.statusCode).to.be.equal(200);
+
+              expect(response.body).to.be.an('object');
+            
+              var room = response.body;
+
+              expect(room.id).to.be.equal(lastRoomId);
+
+              done();
+          });
+          
         });
     });
 

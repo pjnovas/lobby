@@ -17,17 +17,20 @@ describe('Events', function(){
   var lobby = new Lobby();
 
   lobby.events(io, {
-    message: function(data, done){
-      if (data.invalid){
-        return done('error thrown');
-      }
+    autoRemove: 500,
+    customs: {
+      message: function(data, done){
+        if (data.invalid){
+          return done('error thrown');
+        }
 
-      done(null, {
-        xdata: data
-      });
-    },
-    other: function(data, done){
-      done(null, data);
+        done(null, {
+          xdata: data
+        });
+      },
+      other: function(data, done){
+        done(null, data);
+      }
     }
   });
 

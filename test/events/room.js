@@ -627,6 +627,72 @@ module.exports = function(lobby){
 
     });
 
+    it('should auto remove a user when it get disconnected', function(done){
+      var 
+        uid1 = 'uid12',
+        uid2 = 'uid22',
+        fireDisconnect = false,
+        fireLeave = false;
+
+      var room = lobby.create({
+        seats: 3
+      });
+
+      room.join(uid1);
+
+      var client_uid1 = io.connect(socketURL, options);
+      
+      client_uid1.on('room:user:leave',function(data){
+        expect(data.id).to.be.equal(uid2);
+        fireLeave = true;
+      });
+
+      client_uid1.on('room:user:disconnect',function(data){
+        expect(data.id).to.be.equal(uid2);
+        fireDisconnect = true;
+      });
+
+      client_uid1.on('connect',function(data){
+        
+        client_uid1.emit('room:user:connect', {
+          userId: uid1,
+          roomId: room.id
+        }, function(err){
+          expect(err).to.not.be.ok();
+
+          room.join(uid2);
+
+          var client_uid2 = io.connect(socketURL, options);
+
+          client_uid2.on('connect',function(data){
+
+            client_uid2.emit('room:user:connect', {
+              userId: uid2,
+              roomId: room.id
+            }, function(err){
+              expect(err).to.not.be.ok();
+
+              client_uid2.disconnect();
+
+              setTimeout(function(){
+
+                expect(fireDisconnect).to.be.equal(true);
+                expect(fireLeave).to.be.equal(true);
+
+                client_uid1.disconnect();
+                room.clear();
+                done();
+
+              }, 600);
+            });
+          });
+        });
+
+      });
+
+    });
+
   });
 
+  
 };

@@ -212,6 +212,23 @@ describe('Lobby', function(){
     lobby.removeAllListeners('room:create');
   });
 
+  it('should allow to find a room by user', function(){
+    var roomA = lobby.queue({
+      seats: 2
+    });
+
+    roomA.join('uidA');
+    
+    var roomB = lobby.queue({
+      seats: 2
+    });
+
+    roomB.join('uidB');
+
+    var lastRoom = lobby.getRoomByUser('uidA');
+    expect(lastRoom.id).to.be.equal(roomA.id);
+  });
+
   it('should expose all errors', function(){
     expect(Lobby.error.UserNotFound).to.be(require('../../lib/errors/UserNotFound'));
     expect(Lobby.error.RoomNotFound).to.be(require('../../lib/errors/RoomNotFound'));

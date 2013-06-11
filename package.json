@@ -1,12 +1,13 @@
 {
   "name": "lobby",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Room factory of Users for NodeJS with ExpressJS routes and SocketIO events",
   "author": "Pablo Novas <pjnovas@gmail.com>",
   "main": "index.js",
   "directories": {
     "lib": "lib",
-    "test": "test"
+    "test": "test",
+    "examples": "examples"
   },
   "engines": {
     "node": ">=0.8.x"
