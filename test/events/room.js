@@ -527,6 +527,73 @@ module.exports = function(lobby){
 
     });
 
+    it('should be able to UnReady a room when a user get disconnected', function(done){
+      var 
+        uid1 = 'uid1',
+        uid2 = 'uid2',
+        uid3 = 'uid3',
+        fireFull = 0,
+        fireWaiting = 0;
+
+      var room = lobby.create({
+        seats: 3
+      });
+
+      room.join(uid1);
+
+      var client_uid1 = io.connect(socketURL, options);
+      var client_uid2;
+      var client_uid3;
+      
+      client_uid1.on('room:full',function(){
+        fireFull++;
+      });
+
+      client_uid1.on('room:waiting',function(){
+        fireWaiting++;
+      });
+
+      function connectUser(client, uid, done){
+        client.on('connect',function(err, data){
+          expect(err).to.not.be.ok();
+
+          client.emit('room:user:connect', {
+            userId: uid,
+            roomId: room.id
+          }, done);
+        });
+      }
+
+      connectUser(client_uid1, uid1, function(){
+
+        room.join(uid2);
+        room.join(uid3);
+
+        client_uid2 = io.connect(socketURL, options);
+        connectUser(client_uid2, uid2, function(){
+  
+          client_uid3 = io.connect(socketURL, options);
+          connectUser(client_uid3, uid3, function(){
+
+            client_uid3.disconnect();
+                    
+            setTimeout(function(){
+
+              expect(fireFull).to.be.equal(2);
+              expect(fireWaiting).to.be.equal(1);
+              
+              client_uid1.disconnect();
+              client_uid2.disconnect();
+              room.clear();
+              done(); 
+            }, 600);
+
+          });
+        });
+      });
+
+    });
+
     it('should allow to use custom events', function(done){
       var 
         uid1 = 'uid1',
