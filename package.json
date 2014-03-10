@@ -30,7 +30,7 @@
     "grunt-mocha-cov": "0.0.7",
     "mocha-term-cov-reporter": "0.1.x"
   },
-  "scripts": {
+  "config": {
     "blanket": {
       "pattern": "/lobby/lib/"
     },
